@@ -1,4 +1,5 @@
 # rp2040-neopixel
+
 With this module you can control up to 4 ws2812 LED strips with one rp2040 microcontroller.
 The class uses a maximum of 4 state machines and both processors to achieve a fast output.
 
