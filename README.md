@@ -8,6 +8,7 @@ Each strip is represented as an object with number of LEDs, pin number, and brig
 
 Example:
 mystrip = neopixel2040.strip(100,22,0.5)
+
 The following methods are available for the object:
 
         pset ( position, color ) sets the color at a specific position
