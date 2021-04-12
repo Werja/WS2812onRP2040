@@ -7,7 +7,9 @@ The class strip uses a maximum of 4 state machines and both cores to achieve a f
 Each strip is represented as an object with number of LEDs, pin number, and brightness.
 
 Example:
+
 import neopixel2040 as np
+
 mystrip = np.strip(100,22,0.5)
 
 The following methods are available for the strip objects:
