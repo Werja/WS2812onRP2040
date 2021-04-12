@@ -26,10 +26,10 @@ The following methods are available for the strip objects:
 
         clear ( ) clears everything
 
-The neopixel2040 modul this functions:
+The neopixel2040 modul has this functions:
 
         Wait4ThreadEnd() #stopps the execution while core1 is in use
         
         hue2col(angle)   #return a rgb tuple from chromatic circle
         
-and predefined colors COLORS = (RED, YEL, GRE, CYA, BLU, PUR, WHT, BLK)       
+and predefinded colors COLORS = (RED, YEL, GRE, CYA, BLU, PUR, WHT, BLK)       
