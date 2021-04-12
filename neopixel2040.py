@@ -19,7 +19,8 @@ def ws2812():
     wrap()
     
 core1time = 0
-thread_active = False
+core0time = 0
+thread_user = None
 class strip:
     ''' Methods to manipulate neopixel stripes
         pset     ( position, color) 
@@ -31,17 +32,17 @@ class strip:
         clear    ()
     '''
     counter = 0
-    def __init__(self,NUM_LEDS, PIN_NUM, brightness):
+    def __init__(self,NUM_LEDS, PIN_NUM, BRIGHTNESS):
         self.NUM_LEDS = NUM_LEDS
         self.PIN_NUM = PIN_NUM
-        self.brightness = brightness
+        self.BRIGHTNESS = BRIGHTNESS
         self.now = 0
         if strip.counter < 4:
             # Create the StateMachine 
             self.sm = rp2.StateMachine(strip.counter, ws2812, freq=8_000_000, sideset_base=Pin(self.PIN_NUM))
             # Start the StateMachine
             self.sm.active(1)
-            # array representing a LED stripe 
+            # Displayarray on the LEDs 
             self.ar = array.array("I", [0 for _ in range(self.NUM_LEDS)])
             print("Strip with state machine",strip.counter,"on pin",self.PIN_NUM,"active")
         else:
@@ -49,34 +50,37 @@ class strip:
         strip.counter += 1
     
     def dimm(self,col):
-        r = int(((col >> 8) & 0xFF) * self.brightness)
-        g = int(((col >> 16) & 0xFF) * self.brightness)
-        b = int((col & 0xFF) * self.brightness)
-        return (g<<16) + (r<<8) + b
+        c1 = int(((col >> 16) & 0xFF) * self.BRIGHTNESS)
+        c2 = int(((col >> 8) & 0xFF)  * self.BRIGHTNESS)
+        c3 = int((col & 0xFF)         * self.BRIGHTNESS)
+        return (c1<<16) + (c2<<8) + c3
         
     def show(self):
-        global thread_active, core1time
-        if thread_active:
+        global thread_user, core1time, core0time
+        if (thread_user != None)and(thread_user != self):
             self.sm.put(self.ar, 8)
             utime.sleep_us(10)
+            core0time +=1
         else:
-            self.now = utime.ticks_ms()
-            thread_active = True
+            while thread_user != None:
+                pass
+            thread_user = self
             _thread.start_new_thread(self.put_thread,())
 
     def put_thread(self):
-        global thread_active, core1time 
+        global thread_user, core1time 
         self.sm.put(self.ar, 8)
         utime.sleep_us(10)
-        thread_active = False
-        core1time += (utime.ticks_ms()-self.now)
+        thread_user = None
+        core1time += 1
         
-    def pset(self,i, color):
-        self.ar[i] = self.dimm((color[1]<<16) + (color[0]<<8) + color[2])
-    
-    def fill(self,color):
+    def pset(self,i, col):
+        self.ar[i] = self.dimm((col[1]<<16) + (col[0]<<8) + col[2])
+            
+    def fill(self,col):
+        fillcol=self.dimm((col[1]<<16) + (col[0]<<8) + col[2])
         for i in range(len(self.ar)):
-            self.pset(i, color)
+            self.ar[i] = fillcol
             
     def rotate(self,step):
         cp = array.array("I", self.ar[-step:])
@@ -103,7 +107,10 @@ class strip:
         utime.sleep_ms(10)
 
 ##########################################################################
-
+def Wait4ThreadEnd():
+    while thread_user != None:
+        pass
+    
 def hue2col(angle):
     rgb = [0,0,0]
     sec = ((0,1),(1,2),(2,0))
