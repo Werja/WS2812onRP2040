@@ -15,6 +15,5 @@ for i in range(360):
 print("script runtime",utime.ticks_ms()-start,"ms with outputting")
 print("core0 puts",np.core0time)
 print("core1 puts",np.core1time)
-while np.thread_user != None:
-    pass
+np.Wait4ThreadEnd()
 strip1.clear()
