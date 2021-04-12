@@ -2,14 +2,15 @@
 
 With this module you can control up to 4 ws2812 LED strips with one rp2040 microcontroller.
 
-The class uses a maximum of 4 state machines and both cores to achieve a fast output.
+The class strip uses a maximum of 4 state machines and both cores to achieve a fast output.
 
 Each strip is represented as an object with number of LEDs, pin number, and brightness.
 
 Example:
-mystrip = neopixel2040.strip(100,22,0.5)
+import neopixel2040 as np
+mystrip = np.strip(100,22,0.5)
 
-The following methods are available for the object:
+The following methods are available for the strip objects:
 
         pset ( position, color ) sets the color at a specific position
 
@@ -24,3 +25,8 @@ The following methods are available for the object:
         show ( ) displays everything
 
         clear ( ) clears everything
+
+The neopixel2040 modul this functions:
+        Wait4ThreadEnd() #stopps the execution while core1 is in use
+        hue2col(angle)   #return a rgb tuple from chromatic circle
+and predefined colors COLORS = (RED, YEL, GRE, CYA, BLU, PUR, WHT, BLK)       
