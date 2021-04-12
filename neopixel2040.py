@@ -1,18 +1,8 @@
 # Using PIO to drive a set of WS2812 LEDs.
 
-import array, time, _thread
+import array, utime, _thread
 from machine import Pin
 import rp2
-
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-YELLOW = (255, 150, 0)
-GREEN = (0, 255, 0)
-CYAN = (0, 255, 255)
-BLUE = (0, 0, 255)
-PURPLE = (180, 0, 255)
-WHITE = (255, 255, 255)
-COLORS = (BLACK, RED, YELLOW, GREEN, CYAN, BLUE, PURPLE, WHITE)
 
 @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
 def ws2812():
@@ -27,7 +17,8 @@ def ws2812():
     label("do_zero")
     nop()                   .side(0)    [T2 - 1]
     wrap()
-
+    
+core1time = 0
 thread_active = False
 class strip:
     ''' Methods to manipulate neopixel stripes
@@ -38,18 +29,19 @@ class strip:
         rainbow  ( [starthue , [endhue]] )
         show     ()
         clear    ()
-        '''
+    '''
     counter = 0
     def __init__(self,NUM_LEDS, PIN_NUM, brightness):
         self.NUM_LEDS = NUM_LEDS
         self.PIN_NUM = PIN_NUM
         self.brightness = brightness
+        self.now = 0
         if strip.counter < 4:
-            # Create the StateMachine with the ws2812 program, outputting on pin
+            # Create the StateMachine 
             self.sm = rp2.StateMachine(strip.counter, ws2812, freq=8_000_000, sideset_base=Pin(self.PIN_NUM))
-            # Start the StateMachine, it will wait for data on its FIFO.
+            # Start the StateMachine
             self.sm.active(1)
-            # Display a pattern on the LEDs via an array of LED RGB values.
+            # array representing a LED stripe 
             self.ar = array.array("I", [0 for _ in range(self.NUM_LEDS)])
             print("Strip with state machine",strip.counter,"on pin",self.PIN_NUM,"active")
         else:
@@ -63,17 +55,21 @@ class strip:
         return (g<<16) + (r<<8) + b
         
     def show(self):
-        global thread_active
+        global thread_active, core1time
         if thread_active:
             self.sm.put(self.ar, 8)
+            utime.sleep_us(10)
         else:
+            self.now = utime.ticks_ms()
             thread_active = True
             _thread.start_new_thread(self.put_thread,())
- 
+
     def put_thread(self):
-        global thread_active
+        global thread_active, core1time 
         self.sm.put(self.ar, 8)
+        utime.sleep_us(10)
         thread_active = False
+        core1time += (utime.ticks_ms()-self.now)
         
     def pset(self,i, color):
         self.ar[i] = self.dimm((color[1]<<16) + (color[0]<<8) + color[2])
@@ -104,7 +100,7 @@ class strip:
     def clear(self):
         self.ar = array.array("I", [0 for _ in range(self.NUM_LEDS)])
         self.sm.put(self.ar, 8)
-        time.sleep_ms(10)
+        utime.sleep_ms(10)
 
 ##########################################################################
 
@@ -114,3 +110,13 @@ def hue2col(angle):
     rgb[sec[int(angle/120)][1]]=int(255/120*(angle%120))
     rgb[sec[int(angle/120)][0]]=int(255/120*(120-(angle%120)))
     return (rgb[0],rgb[1],rgb[2])
+
+RED = (hue2col(0))
+YEL = (hue2col(60))
+GRE = (hue2col(120))
+CYA = (hue2col(180))
+BLU = (hue2col(240))
+PUR = (hue2col(300))
+WHT = (255, 255, 255)
+BLK = (0,0,0)
+COLORS = (RED, YEL, GRE, CYA, BLU, PUR, WHT, BLK)
