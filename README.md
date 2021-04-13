@@ -30,7 +30,7 @@ The following methods are available for the strip objects:
 
 The neopixel2040 modul has this functions:
 
-        Wait4ThreadEnd() #stopps the execution while core1 is in use
+        Wait4ThreadEnd() #wait while core1 is in use
         
         hue2col(angle)   #return a rgb tuple from chromatic circle
         
