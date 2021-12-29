@@ -1,4 +1,4 @@
-# rp2040-neopixel
+# WS2812onRP2040
 
 With this module you can control up to 4 ws2812 LED strips with one rp2040 microcontroller.
 
