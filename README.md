@@ -13,15 +13,25 @@ import WS2812onRP2040 as np
 mystrip = np.strip(100,22,0.5)
 
 The following methods are available for the strip objects:
+
         Methods to manipulate 2812 stripes:
+        
         pset     ( position, color,[optional show(0 or 1)]) 
+        
         fill     ( (r,g,b),[optional show(0 or 1)] )
+        
         rotate   ( steps,[optional show(0 or 1)] )
+        
         shift    ( steps,[optional show(0 or 1)] )
+        
         rainbow  ( [starthue , [endhue]],[optional show(0 or 1)] )
+        
         show     ()
+        
         Properties:
+        
         BRIGHTNESS (value between 0 and 1)
+        
 
 The WS2812onRP2040 modul has this functions:
         
