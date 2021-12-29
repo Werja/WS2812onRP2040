@@ -8,7 +8,7 @@ Each strip is represented as an object with number of LEDs, pin number, and brig
 
 Example:
 
-import neopixel2040 as np
+import WS2812onRP2040 as np
 
 mystrip = np.strip(100,22,0.5)
 
@@ -29,9 +29,7 @@ The following methods are available for the strip objects:
         clear ( ) clears everything
 
 The neopixel2040 modul has this functions:
-
-        Wait4ThreadEnd() #wait while core1 is in use
         
         hue2col(angle)   #return a rgb tuple from chromatic circle
         
-and predefinded colors COLORS = (RED, YEL, GRE, CYA, BLU, PUR, WHT, BLK)       
+        and predefinded colors COLORS = (RED, YEL, GRE, CYA, BLU, PUR, WHT, BLK)       
